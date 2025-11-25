@@ -23,9 +23,9 @@ public class DagligFast : Ordination {
 		return base.antalDage() * doegnDosis();
 	}
 
-	public override double doegnDosis() {
-		// TODO: Implement!
-        return -1;
+	public override double doegnDosis()
+	{
+		return MorgenDosis.antal + MiddagDosis.antal + AftenDosis.antal + NatDosis.antal;
 	}
 	
 	public Dosis[] getDoser() {

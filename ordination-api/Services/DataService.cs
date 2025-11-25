@@ -138,8 +138,7 @@ public class DataService
     public DagligFast OpretDagligFast(int patientId, int laegemiddelId, 
         double antalMorgen, double antalMiddag, double antalAften, double antalNat, 
         DateTime startDato, DateTime slutDato) {
-
-        // TODO: Implement!
+        
         return null!;
     }
 
