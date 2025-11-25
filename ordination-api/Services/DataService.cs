@@ -180,8 +180,39 @@ public class DataService
     }
 
     public DagligSkæv OpretDagligSkaev(int patientId, int laegemiddelId, Dosis[] doser, DateTime startDato, DateTime slutDato) {
-        // TODO: Implement!
-        return null!;
+        if (patientId < 0)
+        {
+            Console.WriteLine("patientId is invalid");
+            throw new ArgumentOutOfRangeException();
+        }
+        Laegemiddel? laegemiddel = db.Laegemiddler.FirstOrDefault(l => l.LaegemiddelId == laegemiddelId);
+        if (laegemiddel == null)
+        {
+            throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
+        }
+        if (laegemiddelId < 0)
+        {
+            Console.WriteLine("laegemiddelId is invalid");
+            throw new ArgumentOutOfRangeException();
+        }
+        if (startDato < DateTime.Now || slutDato < DateTime.Now
+                                     || startDato > slutDato)
+        {
+            Console.WriteLine("Date ranges are invalid");
+            throw new ArgumentOutOfRangeException();
+        }
+        Patient? patient = db.Patienter.FirstOrDefault(p => p.PatientId == patientId);
+        if (patient == null)
+        {
+            throw new ArgumentException($"Patient with id {patientId} not found");
+        }
+
+        DagligSkæv dagligSkaev = new DagligSkæv(startDato, slutDato, laegemiddel); //opretter den nye skæve dosering
+        dagligSkaev.doser = doser.ToList(); //tilføjer doserne til den skæve dosering
+        patient.ordinationer.Add(dagligSkaev); //tilføjer den skæve dosering til patienten til dosisen, så når man under linjen her, sætter dagligskæv ind i db så ryger dens forbindelse til patienten med
+        db.DagligSkæve.Add(dagligSkaev); //tilføjer den skæve dosering objekt til databasen
+        db.SaveChanges();
+        return dagligSkaev;
     }
 
     public string AnvendOrdination(int id, Dato dato) {
