@@ -7,7 +7,7 @@ public class Laegemiddel
     public double enhedPrKgPrDoegnLet { get; set; }    // faktor der anvendes hvis patient vejer < 25 kg
     public double enhedPrKgPrDoegnNormal { get; set; } // faktor der anvendes hvis 25 kg <= patient vægt <= 120 kg
     public double enhedPrKgPrDoegnTung { get; set; }   // faktor der anvendes hvis patient vægt > 120 kg 
-    public String enhed { get; set; }
+    public String enhed { get; set; } //om det ml eller gram eller lign
 
     public Laegemiddel(String navn, double enhedPrKgPrDoegnLet, double enhedPrKgPrDoegnNormal,
             double enhedPrKgPrDoegnTung, String enhed)

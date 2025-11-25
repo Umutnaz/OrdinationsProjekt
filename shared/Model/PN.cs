@@ -2,7 +2,7 @@ namespace shared.Model;
 
 public class PN : Ordination {
 	public double antalEnheder { get; set; }
-    public List<Dato> dates { get; set; } = new List<Dato>();
+    public List<Dato> dates { get; set; } = new List<Dato>(); //Logger alle dage der er blevet taget, også de samme dage.
 
     public PN (DateTime startDen, DateTime slutDen, double antalEnheder, Laegemiddel laegemiddel) : base(laegemiddel, startDen, slutDen) {
 		this.antalEnheder = antalEnheder;
@@ -22,9 +22,16 @@ public class PN : Ordination {
     }
 
     public override double doegnDosis() {
-    	// TODO: Implement!
-        return -1;
-    }
+	    if (dates.Count == 0) return 0;
+
+	    var firstDate = dates.Min(d => d.dato).Date;
+	    var lastDate  = dates.Max(d => d.dato).Date;
+
+	    int antalDage = (lastDate - firstDate).Days + 1; // begge dage med
+
+	    return (dates.Count * antalEnheder) / antalDage;
+    } 
+
 
 
     public override double samletDosis() {
