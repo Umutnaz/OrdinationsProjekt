@@ -42,6 +42,39 @@ public class ServiceTest
     }
 
     [TestMethod]
+    public void InvalidDagligFastParametre()
+    {
+        int patientId = -1;
+        int laegemiddelId = 1;
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1,
+            1, 1, DateTime.Today.AddDays(1),DateTime.Now.AddDays(2)));
+        
+        patientId = 1;
+        laegemiddelId = -1;
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1,
+            1, 1, DateTime.Today.AddDays(1),DateTime.Now.AddDays(2)));
+        
+        DateTime invalidStart = DateTime.Now.AddDays(-1);
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1,
+            1, 1, invalidStart,DateTime.Now.AddDays(2)));
+        
+        DateTime validStart = DateTime.Now.AddDays(5);
+        DateTime invalidEnd = DateTime.Now.AddDays(4);
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1,
+            1, 1, validStart,invalidEnd));
+
+        double invalidDosis = -1;
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, invalidDosis,
+            1, 1, DateTime.Today.AddDays(1),DateTime.Now.AddDays(2)));
+
+    }
+
+    [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
     public void TestAtKodenSmiderEnException()
     {

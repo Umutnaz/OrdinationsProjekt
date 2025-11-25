@@ -168,7 +168,7 @@ public class DataService
 
         // Parameter check til OpretDagligFast
         // Er id'erne korrekt? Er doserne korrekt? Er tidspunkt korrekt?
-        if (patientId < 0 || laegemiddelId < 0)
+        if (patientId < 1 || laegemiddelId < 1)
         {
             Console.WriteLine("patientId or laegemiddelId is invalid");
             throw new ArgumentOutOfRangeException();
@@ -180,7 +180,7 @@ public class DataService
             throw new ArgumentOutOfRangeException();
         }
 
-        if (startDato < DateTime.Now || slutDato < DateTime.Now
+        if (startDato < DateTime.Now.AddDays(-1) || slutDato < DateTime.Now
                                      || startDato > slutDato)
         {
             Console.WriteLine("Date ranges are invalid");
@@ -191,12 +191,12 @@ public class DataService
         Patient? patient = db.Patienter.FirstOrDefault(p => p.PatientId == patientId);
         if (patient == null)
         {
-            throw new ArgumentException($"Patient with id {patientId} not found");
+            throw new NullReferenceException($"Patient with id {patientId} not found");
         }
         Laegemiddel? laegemiddel = db.Laegemiddler.FirstOrDefault(l => l.LaegemiddelId == laegemiddelId);
         if (laegemiddel == null)
         {
-            throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
+            throw new NullReferenceException($"Laegemiddel with id {laegemiddelId} not found");
         }
         DagligFast dagligFast = new DagligFast(startDato, slutDato, laegemiddel, antalMorgen, antalMiddag, antalAften, antalNat);
         
