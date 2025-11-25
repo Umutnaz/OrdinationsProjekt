@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace shared.Model;
 
 public class PN : Ordination {
@@ -10,24 +12,31 @@ public class PN : Ordination {
 
     public PN() : base(null!, new DateTime(), new DateTime()) {
     }
+    
 
     /// <summary>
     /// Registrerer at der er givet en dosis på dagen givesDen
     /// Returnerer true hvis givesDen er inden for ordinationens gyldighedsperiode og datoen huskes
     /// Returner false ellers og datoen givesDen ignoreres
     /// </summary>
-    public bool givDosis(Dato givesDen) {
-        // TODO: Implement!
-        return false;
+    public bool givDosis(Dato givesDen)
+    {
+	    if (givesDen.dato < startDen || givesDen.dato > slutDen) // Check at givesDen.dato ligger mellem startDen og slutDen
+	    {
+		    return false;
+	    }
+	    
+		dates.Add(givesDen); // Hvis ja — tilføj givesDen til dates-list. Og return true.
+		return true; 
     }
 
     public override double doegnDosis() {
 	    if (dates.Count == 0) return 0;
-
-	    var firstDate = dates.Min(d => d.dato).Date;
-	    var lastDate  = dates.Max(d => d.dato).Date;
-
-	    int antalDage = (lastDate - firstDate).Days + 1; // begge dage med
+	    
+	    var firstDate = dates.Min(d => d.dato).Date; // Finder den første dag hvor patienten fik medicin
+	    var lastDate  = dates.Max(d => d.dato).Date; // Finder den sidste første dag hvor patienten fik medicin
+	    
+	    int antalDage = (lastDate - firstDate).Days + 1; // begge dage med — beregner hvor mange dage der gik
 
 	    return (dates.Count * antalEnheder) / antalDage;
     } 
