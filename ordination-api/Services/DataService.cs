@@ -153,7 +153,7 @@ public class DataService
             throw new ArgumentOutOfRangeException();
         }
 
-        if (startDato < DateTime.Now || slutDato < DateTime.Now
+        if (startDato < DateTime.Now.AddDays(-1) || slutDato < DateTime.Now
                                      || startDato > slutDato)
         {
             Console.WriteLine("Date ranges are invalid");
