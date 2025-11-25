@@ -21,8 +21,11 @@ public abstract class Ordination {
     /// Antal hele dage mellem startdato og slutdato. Begge dage inklusive.
     /// </summary>
     public int antalDage() {
-        // TODO: Implement!
-        return -1;
+        return (slutDen.Date - startDen.Date).Days + 1;
+        // +1 fordi både start- og slutdato tælles med
+        // .Date fjerner klokkeslæt, så kun datoen (år, måned, dag) bruges
+        // .Days giver forskellen i hele dage mellem de to datoer. Dvs .Days er antallet af dage. 
+        // Fx 21. til 25. giver (25 - 21) = 4 dage (days), +1 = 5 dage i alt
     }
 
     public override String ToString() {
