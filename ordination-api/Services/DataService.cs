@@ -233,7 +233,7 @@ public class DataService
         {
             throw new ArgumentException($"Patient with id {patientId} not found");
         }
-
+        
         DagligSkæv dagligSkaev = new DagligSkæv(startDato, slutDato, laegemiddel); //opretter den nye skæve dosering
         dagligSkaev.doser = doser.ToList(); //tilføjer doserne til den skæve dosering
         patient.ordinationer.Add(dagligSkaev); //tilføjer den skæve dosering til patienten til dosisen, så når man under linjen her, sætter dagligskæv ind i db så ryger dens forbindelse til patienten med
@@ -242,8 +242,26 @@ public class DataService
         return dagligSkaev;
     }
 
-    public string AnvendOrdination(int id, Dato dato) {
-        // TODO: Implement!
+    public string AnvendOrdination(int id, Dato dato)
+    {
+        
+        PN? pn = db.PNs.Include(p => p.dates).FirstOrDefault(p => p.OrdinationId == id);
+
+        if (pn == null)
+        {
+            throw new NullReferenceException($"PN with id {id} not found");
+        }
+        
+        DateTime pnDato = dato.dato;
+        if (pn.startDen > pnDato || pn.slutDen < pnDato)
+        {
+            throw new ArgumentOutOfRangeException();
+        }
+        
+        pn.dates.Add(dato);
+        db.SaveChanges();
+        return "tilføjet";
+        
         return null!;
     }
 
