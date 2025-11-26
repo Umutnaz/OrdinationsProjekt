@@ -273,8 +273,17 @@ public class DataService
     /// <param name="laegemiddel"></param>
     /// <returns></returns>
 	public double GetAnbefaletDosisPerDøgn(int patientId, int laegemiddelId) {
-        // TODO: Implement!
-        return -1;
-	}
+        if (patientId < 0)
+        {
+            Console.WriteLine("patientId is invalid");
+            throw new ArgumentOutOfRangeException();
+        }
+        Laegemiddel? laegemiddel = db.Laegemiddler.FirstOrDefault(l => l.LaegemiddelId == laegemiddelId);
+        if (laegemiddel == null)
+        {
+            throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
+        }
+             return -1;
+    }
     
 }
