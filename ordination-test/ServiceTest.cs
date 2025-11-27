@@ -75,6 +75,35 @@ public class ServiceTest
     }
 
     [TestMethod]
+    public void PatientEllerLaegemiddelEksistererIkkeDagligFast()
+    {
+        int patientId = int.MaxValue;
+        int laegemiddelId = int.MaxValue;
+        DateTime validStart = DateTime.Now.AddDays(1);
+        DateTime validEnd = DateTime.Now.AddDays(2);
+        
+        // PatientId
+        Assert.ThrowsException<NullReferenceException>(()=> service.OpretDagligFast(patientId, 1, 2, 2, 2, 2, validStart, validEnd));
+        // laegemiddelId
+        Assert.ThrowsException<NullReferenceException>(()=> service.OpretDagligFast(1, laegemiddelId, 2, 2, 2, 2, validStart, validEnd));
+    }
+    
+    [TestMethod]
+    public void StartDatoLigMedSlutDatoDagligFast()
+    {
+        int patientId = 1;
+        int laegemiddelId = 1;
+        DateTime startDato = DateTime.Now.AddDays(1);
+        DateTime endDato = DateTime.Now.AddDays(1);
+        
+        Assert.AreEqual(1, service.GetDagligFaste().Count());
+        
+        service.OpretDagligFast(patientId, laegemiddelId, 1, 1, 1, 1,  startDato, endDato);
+        
+        Assert.AreEqual(2, service.GetDagligFaste().Count());
+    }
+
+    [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
     public void TestAtKodenSmiderEnException()
     {
