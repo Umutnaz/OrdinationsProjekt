@@ -96,11 +96,11 @@ public class ServiceTest
         DateTime startDato = DateTime.Now.AddDays(1);
         DateTime endDato = DateTime.Now.AddDays(1);
         
-        Assert.AreEqual(1, service.GetDagligFaste().Count());
+        int count = service.GetDagligFaste().Count();
         
         service.OpretDagligFast(patientId, laegemiddelId, 1, 1, 1, 1,  startDato, endDato);
         
-        Assert.AreEqual(2, service.GetDagligFaste().Count());
+        Assert.AreEqual(count + 1, service.GetDagligFaste().Count());
     }
 
     [TestMethod]
