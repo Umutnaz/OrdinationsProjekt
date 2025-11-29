@@ -201,7 +201,7 @@ public class DataService
         }
         DagligFast dagligFast = new DagligFast(startDato, slutDato, laegemiddel, antalMorgen, antalMiddag, antalAften, antalNat);
         
-        db.DagligFaste.Add(dagligFast);
+        patient.ordinationer.Add(dagligFast);
         db.SaveChanges();
         
         return dagligFast;
@@ -262,8 +262,6 @@ public class DataService
         pn.dates.Add(dato);
         db.SaveChanges();
         return "tilføjet";
-        
-        return null!;
     }
 
     public OrdinationVaegtDTO? GetOrdinationer(int vaegtFra, int vaegtTil, int laegemiddelId)
