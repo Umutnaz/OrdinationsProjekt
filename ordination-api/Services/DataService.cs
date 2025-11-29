@@ -138,7 +138,8 @@ public class DataService
             if (antal <= 0)
                 throw new ArgumentOutOfRangeException("skal være over 0");
 
-            if (startDato > slutDato)
+            if (startDato < DateTime.Now.AddDays(-1) || slutDato < DateTime.Now
+                                                     || startDato > slutDato)
                 throw new ArgumentOutOfRangeException("startdate må ikke være slutdate");
             
             Patient? patient = db.Patienter.FirstOrDefault(p => p.PatientId == patientId);
@@ -222,8 +223,8 @@ public class DataService
             Console.WriteLine("laegemiddelId is invalid");
             throw new ArgumentOutOfRangeException();
         }
-        if (startDato < DateTime.Now || slutDato < DateTime.Now
-                                     || startDato > slutDato)
+        if (startDato < DateTime.Now.AddDays(-1) || slutDato < DateTime.Now
+                                                 || startDato > slutDato)
         {
             Console.WriteLine("Date ranges are invalid");
             throw new ArgumentOutOfRangeException();
