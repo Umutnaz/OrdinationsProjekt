@@ -61,6 +61,14 @@ app.MapGet("/api/ordinationer", (DataService service) =>
     });
 });
 
+app.MapPost("/api/ordinationer/specifik", (DataService service, SpecifikOrdinationDTO dto) => 
+{
+    var res = service.GetOrdinationer(dto.vaegtFra, dto.vaegtTil, dto.laegemiddelId);
+    if (res != null)
+        return Results.Ok(res);
+    return Results.NotFound();
+});
+
 app.MapGet("/api/patienter", (DataService service) =>
 {
     return service.GetPatienter().Select(p => new
