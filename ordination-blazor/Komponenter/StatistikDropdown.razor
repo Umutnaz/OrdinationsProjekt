@@ -12,33 +12,63 @@
             @if (antalPatienter > 0)
             {
                 <ul>
-                    @foreach (var ordination in pns)
+                    <h3>PN</h3>
+                    @if (pns.Count == 0)
                     {
-                    <li>
-                        <span>@ordination.PNOrdination.OrdinationId</span>
-                        <span>@ordination.PNOrdination.startDen</span>
-                        <span>@ordination.PNOrdination.slutDen</span>
-                    </li>
+                        <p>Ingen PN ordinationer</p>
+                    }
+                    else
+                    {
+                        @foreach (var ordination in pns)
+                        {
+                            <li>
+                                <span><b>Ordination ID: </b>@ordination.PNOrdination.OrdinationId</span><br/>
+                                <span><b>Ordination Start: </b>@ordination.PNOrdination.startDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Ordination Slut: </b>@ordination.PNOrdination.slutDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Patient Vægt: </b>@ordination.Vaegt</span><br/>
+                            </li>
+                            <hr>
+                        }
                     }
                 </ul>
                 <ul>
-                    @foreach (var ordination in fast)
+                    <h3>DagligFast</h3>
+                    @if (fast.Count == 0)
                     {
-                        <li>
-                            <span>@ordination.DagligFastOrdination.OrdinationId</span>
-                            <span>@ordination.DagligFastOrdination.startDen</span>
-                            <span>@ordination.DagligFastOrdination.slutDen</span>
-                        </li>
+                        <p>Ingen Daglig fast ordinationer</p>
+                    }
+                    else
+                    {
+                        @foreach (var ordination in fast)
+                        {
+                            <li>
+                                <span><b>Ordination ID: </b>@ordination.DagligFastOrdination.OrdinationId</span><br/>
+                                <span><b>Ordination Start: </b>@ordination.DagligFastOrdination.startDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Ordination Slut: </b>@ordination.DagligFastOrdination.slutDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Patient Vægt: </b>@ordination.Vaegt</span>
+                            </li>
+                            <hr>
+                        }
                     }
                 </ul>
                 <ul>
-                    @foreach (var ordination in skæv)
+                    <h3>DagligSkæv</h3>
+                    @if (fast.Count == 0)
                     {
-                        <li>
-                            <span>@ordination.DagligSkævOrdination.OrdinationId</span>
-                            <span>@ordination.DagligSkævOrdination.startDen</span>
-                            <span>@ordination.DagligSkævOrdination.slutDen</span>
-                        </li>
+                        <p>Ingen Daglig skæv ordinationer</p>
+                    }
+                    else
+                    {
+                        @foreach (var ordination in skæv)
+                        {
+                            <li>
+                                <span><b>Ordination ID: </b>@ordination.DagligSkævOrdination.OrdinationId</span><br/>
+                                <span><b>Ordination Start: </b>@ordination.DagligSkævOrdination.startDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Ordination Slut: </b>@ordination.DagligSkævOrdination.slutDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Patient Vægt: </b>@ordination.Vaegt</span>
+                            </li>
+                            <hr>
+                        }
                     }
                 </ul>
             }
@@ -47,13 +77,13 @@
 </div>
 @code {
     [Parameter]
-    List<PNVaegtDTO> pns { get; set; }
+    public List<PNVaegtDTO> pns { get; set; }
     [Parameter] 
-    List<DagligFastVaegtDTO> fast { get; set; }
+    public List<DagligFastVaegtDTO> fast { get; set; }
     [Parameter]
-    List<DagligSkævVaegtDTO> skæv { get; set; }
+    public List<DagligSkævVaegtDTO> skæv { get; set; }
     [Parameter]
-    int antalPatienter { get; set; }
+    public int antalPatienter { get; set; }
     private bool _isOpen = false;
     private void ToggleDropdown() => _isOpen = !_isOpen;
 }

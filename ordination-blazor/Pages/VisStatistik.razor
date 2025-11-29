@@ -34,7 +34,7 @@
             <div class="form-group row">
                 <label for="lm" class="col-sm-4 col-form-label">Lægemiddel</label>
                 <div class="col-sm-8">
-                    <InputSelect TValue="int" @bind-Value="@laegemiddelId" @onchange="OnLaegemiddelChange">
+                    <InputSelect TValue="int" @bind-Value="@laegemiddelId" @oninput="OnLaegemiddelChange">
                         <option value="">Vælg lægemiddel</option>
                         @foreach (var laegemiddel in laegemiddler)
                         {
@@ -49,13 +49,13 @@
         <div class="col-md-12 border p-3">
             <h3>Resultat</h3>
 
-            <div class="form-group row">
-                <label for="antal" class="col-sm-4 col-form-label">Antal: @antalPatienter</label>
-                <div class="col-sm-8">
+            <div class="form-group col">
+                <label>Antal Ordinationer: @antalPatienter</label>
+                <div class="col-sm-8" style="display: flex; justify-content: center; width: 100%">
                     @if (antalPatienter > 0)
                     {
-                        <div>
-                            <StatistikDropdown @pns="pns" @fast="fast" @skæv="skæv" @antalPatienter="antalPatienter" @ref="@dropdown"></StatistikDropdown>
+                        <div style="width: 90%">
+                            <StatistikDropdown pns="pns" fast="fast" skæv="skæv" antalPatienter="antalPatienter" @ref="@dropdown"></StatistikDropdown>
                         </div>
                     }
                 </div>
@@ -67,8 +67,7 @@
 </div>
 
 @code {
-    public Ordination? ordination;
-   
+    
     List<PNVaegtDTO> pns = new List<PNVaegtDTO>();
     List<DagligFastVaegtDTO> fast = new List<DagligFastVaegtDTO>();
     List<DagligSkævVaegtDTO> skæv = new List<DagligSkævVaegtDTO>();
@@ -124,10 +123,25 @@
             var dto = await apiService.GetOrdinationerStatistik(vaegtFra, vaegtTil, laegemiddelId);
             if (dto != null)
             {
-                pns = dto.PNOrdinationer;
-                fast = dto.DagligFastOrdinationer;
-                skæv = dto.DagligSkævOrdinationer;
-                antalPatienter = pns.Count + fast.Count + skæv.Count;
+                antalPatienter = 0;
+                if (dto.PNOrdinationer != null)
+                {
+                    pns = dto.PNOrdinationer;
+                    antalPatienter += pns.Count;
+                }
+
+                if (dto.DagligFastOrdinationer != null)
+                {
+                    fast = dto.DagligFastOrdinationer;
+                    antalPatienter += fast.Count;
+                }
+
+                if (dto.DagligSkævOrdinationer != null)
+                {
+                    skæv = dto.DagligSkævOrdinationer;
+                    antalPatienter += skæv.Count;
+                }
+                
             }
             else
             {
@@ -136,6 +150,10 @@
                 skæv = new List<DagligSkævVaegtDTO>();
                 antalPatienter = 0;
             }
+        }
+        else
+        {
+            errorMessage = "Et lægemiddel skal indtastes";
         }
         
         StateHasChanged();
@@ -172,10 +190,24 @@
             var dto = await apiService.GetOrdinationerStatistik(vaegtFra, vaegtTil, laegemiddelId);
             if (dto != null)
             {
-                pns = dto.PNOrdinationer;
-                fast = dto.DagligFastOrdinationer;
-                skæv = dto.DagligSkævOrdinationer;
-                antalPatienter = pns.Count + fast.Count + skæv.Count;
+                antalPatienter = 0;
+                if (dto.PNOrdinationer != null)
+                {
+                    pns = dto.PNOrdinationer;
+                    antalPatienter += pns.Count;
+                }
+
+                if (dto.DagligFastOrdinationer != null)
+                {
+                    fast = dto.DagligFastOrdinationer;
+                    antalPatienter += fast.Count;
+                }
+
+                if (dto.DagligSkævOrdinationer != null)
+                {
+                    skæv = dto.DagligSkævOrdinationer;
+                    antalPatienter += skæv.Count;
+                }
             }
             else
             {
@@ -184,6 +216,10 @@
                 skæv = new List<DagligSkævVaegtDTO>();
                 antalPatienter = 0;
             }
+        }
+        else
+        {
+            errorMessage = "Et lægemiddel skal indtastes";
         }
         
         StateHasChanged();
