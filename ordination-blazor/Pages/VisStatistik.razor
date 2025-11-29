@@ -1,5 +1,6 @@
 @page "/Statistik"
 
+@using ordination_blazor.Komponenter
 @using ordinationsapp.Data;
 @using shared.Model;
 @using ordinationsapp.Shared
@@ -19,32 +20,44 @@
             <div class="form-group row">
                 <label for="vægtfra" class="col-sm-4 col-form-label">Vægt fra</label>
                 <div class="col-sm-8">
-                <input type="number" class="form-control" id="vægtfra">
+                    <input type="number" id="vægtfra" @oninput="(ChangeEventArgs args) => HandleVaegtChange(args, true)">
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="vægttil" class="col-sm-4 col-form-label">Vægt til</label>
                 <div class="col-sm-8">
-                <input type="number" class="form-control" id="vægttil">
+                    <input type="number" id="vægttil" @oninput="(ChangeEventArgs args) => HandleVaegtChange(args, false)">
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="lm" class="col-sm-4 col-form-label">Lægemiddel</label>
                 <div class="col-sm-8">
-                <input type="text" class="form-control" id="lm">
+                    <InputSelect TValue="int" @bind-Value="@laegemiddelId" @onchange="OnLaegemiddelChange">
+                        <option value="">Vælg lægemiddel</option>
+                        @foreach (var laegemiddel in laegemiddler)
+                        {
+                            <option value="@laegemiddel.LaegemiddelId">@laegemiddel.navn</option>
+                        }
+                    </InputSelect>
                 </div>
             </div>
+            <span style="color: red">@errorMessage</span>
         </div>
 
         <div class="col-md-12 border p-3">
             <h3>Resultat</h3>
 
             <div class="form-group row">
-                <label for="antal" class="col-sm-4 col-form-label">Antal</label>
+                <label for="antal" class="col-sm-4 col-form-label">Antal: @antalPatienter</label>
                 <div class="col-sm-8">
-                <input readonly type="number" class="form-control" id="antal">
+                    @if (antalPatienter > 0)
+                    {
+                        <div>
+                            <StatistikDropdown @pns="pns" @fast="fast" @skæv="skæv" @antalPatienter="antalPatienter" @ref="@dropdown"></StatistikDropdown>
+                        </div>
+                    }
                 </div>
             </div>
 
@@ -55,5 +68,125 @@
 
 @code {
     public Ordination? ordination;
-    public List<Ordination> ordinationer = new List<Ordination>();
+   
+    List<PNVaegtDTO> pns = new List<PNVaegtDTO>();
+    List<DagligFastVaegtDTO> fast = new List<DagligFastVaegtDTO>();
+    List<DagligSkævVaegtDTO> skæv = new List<DagligSkævVaegtDTO>();
+
+    public List<Laegemiddel> laegemiddler = new List<Laegemiddel>();
+    public int laegemiddelId;
+
+    StatistikDropdown? dropdown { get; set; }
+    
+    string errorMessage = "";
+    
+    int vaegtFra = 0;
+    int vaegtTil = 0;
+
+    int antalPatienter = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var midler = await apiService.GetLaegemidler();
+        laegemiddler = midler.ToList();
+    }
+
+    private async Task HandleVaegtChange(ChangeEventArgs e, bool fraVaegt)
+    {
+        var inString = e.Value!.ToString();
+        bool erTal = fraVaegt ? int.TryParse(inString, out vaegtFra) : int.TryParse(inString, out vaegtTil);
+
+        if (!erTal)
+        {
+            errorMessage = "Vægt skal være et helt tal";
+            StateHasChanged();
+            return;
+        }
+        if (vaegtFra < 0 || vaegtTil < 0)
+        {
+            errorMessage = "Vægt kan ikke være negativ";
+            StateHasChanged();
+            return;
+        }
+
+        if (vaegtFra > vaegtTil)
+        {
+            errorMessage = "Vægt fra kan ikke være mere end vægt til";
+            StateHasChanged();
+            return;
+        }
+
+        errorMessage = "";
+        
+        // Lægemiddel er valgt
+        if (laegemiddelId != 0)
+        {
+            var dto = await apiService.GetOrdinationerStatistik(vaegtFra, vaegtTil, laegemiddelId);
+            if (dto != null)
+            {
+                pns = dto.PNOrdinationer;
+                fast = dto.DagligFastOrdinationer;
+                skæv = dto.DagligSkævOrdinationer;
+                antalPatienter = pns.Count + fast.Count + skæv.Count;
+            }
+            else
+            {
+                pns = new List<PNVaegtDTO>();
+                fast = new List<DagligFastVaegtDTO>();
+                skæv = new List<DagligSkævVaegtDTO>();
+                antalPatienter = 0;
+            }
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task OnLaegemiddelChange(ChangeEventArgs e)
+    {
+        var valAsString = e.Value.ToString();
+        if (!int.TryParse(valAsString, out laegemiddelId))
+        {
+            errorMessage = "Kunne ikke finde laegemiddel";
+            StateHasChanged();
+            return;
+        }
+
+        if (vaegtFra < 0 || vaegtTil < 0)
+        {
+            errorMessage = "Vægt kan ikke være negativ";
+            StateHasChanged();
+            return;
+        }
+
+        if (vaegtFra > vaegtTil)
+        {
+            errorMessage = "Vægt fra kan ikke være mere end vægt til";
+            StateHasChanged();
+            return;
+        }
+        
+        errorMessage = "";
+        
+        if (laegemiddelId != 0)
+        {
+            var dto = await apiService.GetOrdinationerStatistik(vaegtFra, vaegtTil, laegemiddelId);
+            if (dto != null)
+            {
+                pns = dto.PNOrdinationer;
+                fast = dto.DagligFastOrdinationer;
+                skæv = dto.DagligSkævOrdinationer;
+                antalPatienter = pns.Count + fast.Count + skæv.Count;
+            }
+            else
+            {
+                pns = new List<PNVaegtDTO>();
+                fast = new List<DagligFastVaegtDTO>();
+                skæv = new List<DagligSkævVaegtDTO>();
+                antalPatienter = 0;
+            }
+        }
+        
+        StateHasChanged();
+    }
+    
 }

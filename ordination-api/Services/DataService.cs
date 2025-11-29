@@ -265,6 +265,71 @@ public class DataService
         return null!;
     }
 
+    public OrdinationVaegtDTO? GetOrdinationer(int vaegtFra, int vaegtTil, int laegemiddelId)
+    {
+        // Filtrer efter vægt
+        List<Patient> patienterMedRigtigVægt = db.Patienter.Include(p => p.ordinationer).ThenInclude(p => p.laegemiddel).Where(p => p.vaegt >= vaegtFra && p.vaegt <= vaegtTil).ToList();
+        if (patienterMedRigtigVægt.Count <= 0)
+        {
+            return null;
+        }
+        
+        // Find ordinationer med rigtige lægemiddel-navn, kobl sammen med patient vægt
+        List<PNVaegtDTO> pns = new List<PNVaegtDTO>();
+        List<DagligFastVaegtDTO> fast = new List<DagligFastVaegtDTO>();
+        List<DagligSkævVaegtDTO> skæv = new List<DagligSkævVaegtDTO>();
+        
+        foreach (Patient patient in patienterMedRigtigVægt)
+        {
+            foreach (Ordination ordination in patient.ordinationer)
+            {
+                if (ordination.laegemiddel.LaegemiddelId == laegemiddelId)
+                {
+                    switch (ordination.getType())
+                    {
+                        case "PN":
+                            PNVaegtDTO pn = new PNVaegtDTO()
+                            {
+                                PNOrdination = (PN)ordination,
+                                Vaegt = patient.vaegt,
+                            };
+                            pns.Add(pn);
+                            break;
+                        case "DagligSkæv":
+                            DagligSkævVaegtDTO sk = new DagligSkævVaegtDTO()
+                            {
+                                DagligSkævOrdination = (DagligSkæv)ordination,
+                                Vaegt = patient.vaegt,
+                            };
+                            skæv.Add(sk);
+                            break;
+                        case "DagligFast":
+                            DagligFastVaegtDTO dag = new DagligFastVaegtDTO()
+                            {
+                                DagligFastOrdination = (DagligFast)ordination,
+                                Vaegt = patient.vaegt,
+                            };
+                            fast.Add(dag);
+                            break;
+                        default:
+                            Console.WriteLine("Unknown ordination type");
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+        }
+        if (pns.Count <= 0 &&  fast.Count <= 0 && skæv.Count <= 0)
+            return null;
+        
+        var dto = new OrdinationVaegtDTO()
+        {
+            PNOrdinationer = pns,
+            DagligFastOrdinationer = fast,
+            DagligSkævOrdinationer = skæv
+        };
+        return dto;
+    }
+
     /// <summary>
     /// Den anbefalede dosis for den pågældende patient, per døgn, hvor der skal tages hensyn til
 	/// patientens vægt. Enheden afhænger af lægemidlet. Patient og lægemiddel må ikke være null.
@@ -283,7 +348,7 @@ public class DataService
         {
             throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
         }
-             return -1;
+        return -1;
     }
     
 }

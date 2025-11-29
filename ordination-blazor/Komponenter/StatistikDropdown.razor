@@ -1,0 +1,59 @@
+@using shared.Model
+<div class="imagedropdown-container">
+    
+    <div class="imagedropdown-header" @onclick="ToggleDropdown">
+        <span class="imagedropdown-arrow">▼ Ordinationer</span>
+    </div>
+    
+    @*hvis dropdown er åben, vises indholdet nedenfor*@
+    @if (_isOpen)
+    {
+        <div>
+            @if (antalPatienter > 0)
+            {
+                <ul>
+                    @foreach (var ordination in pns)
+                    {
+                    <li>
+                        <span>@ordination.PNOrdination.OrdinationId</span>
+                        <span>@ordination.PNOrdination.startDen</span>
+                        <span>@ordination.PNOrdination.slutDen</span>
+                    </li>
+                    }
+                </ul>
+                <ul>
+                    @foreach (var ordination in fast)
+                    {
+                        <li>
+                            <span>@ordination.DagligFastOrdination.OrdinationId</span>
+                            <span>@ordination.DagligFastOrdination.startDen</span>
+                            <span>@ordination.DagligFastOrdination.slutDen</span>
+                        </li>
+                    }
+                </ul>
+                <ul>
+                    @foreach (var ordination in skæv)
+                    {
+                        <li>
+                            <span>@ordination.DagligSkævOrdination.OrdinationId</span>
+                            <span>@ordination.DagligSkævOrdination.startDen</span>
+                            <span>@ordination.DagligSkævOrdination.slutDen</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+</div>
+@code {
+    [Parameter]
+    List<PNVaegtDTO> pns { get; set; }
+    [Parameter] 
+    List<DagligFastVaegtDTO> fast { get; set; }
+    [Parameter]
+    List<DagligSkævVaegtDTO> skæv { get; set; }
+    [Parameter]
+    int antalPatienter { get; set; }
+    private bool _isOpen = false;
+    private void ToggleDropdown() => _isOpen = !_isOpen;
+}
