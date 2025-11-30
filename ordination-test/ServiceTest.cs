@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
-
 namespace ordination_test;
 
 using Microsoft.EntityFrameworkCore;
