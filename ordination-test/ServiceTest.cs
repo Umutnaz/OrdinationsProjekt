@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices.JavaScript;
+
 namespace ordination_test;
 
 using Microsoft.EntityFrameworkCore;
@@ -74,6 +76,30 @@ public class ServiceTest
 
     }
 
+    [TestMethod]
+    public void InvalidIdAnvendOrdination()
+    {
+        int id = -1;
+        Dato dato = new Dato { dato = DateTime.Now };
+
+        Assert.ThrowsException<NullReferenceException>(() => service.AnvendOrdination(id, dato));
+    }
+
+    [TestMethod]
+    public void InvalIdDatoAnvendOrdination()
+    {
+        PN pn = new PN
+        {
+            OrdinationId = 1,
+            startDen = new DateTime(2025, 11, 25),
+            slutDen = new DateTime(2025, 11, 28),
+            dates = new List<Dato>()
+        };
+        Dato dato = new Dato { dato = DateTime.Now };
+
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.AnvendOrdination(pn.OrdinationId, dato));
+    }
+    
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
     public void TestAtKodenSmiderEnException()
