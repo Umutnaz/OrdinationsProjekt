@@ -138,7 +138,8 @@ public class DataService
             if (antal <= 0)
                 throw new ArgumentOutOfRangeException("skal være over 0");
 
-            if (startDato > slutDato)
+            if (startDato < DateTime.Now.AddDays(-1) || slutDato < DateTime.Now
+                                                     || startDato > slutDato)
                 throw new ArgumentOutOfRangeException("startdate må ikke være slutdate");
             
             Patient? patient = db.Patienter.FirstOrDefault(p => p.PatientId == patientId);
@@ -200,7 +201,7 @@ public class DataService
         }
         DagligFast dagligFast = new DagligFast(startDato, slutDato, laegemiddel, antalMorgen, antalMiddag, antalAften, antalNat);
         
-        db.DagligFaste.Add(dagligFast);
+        patient.ordinationer.Add(dagligFast);
         db.SaveChanges();
         
         return dagligFast;
@@ -222,8 +223,8 @@ public class DataService
             Console.WriteLine("laegemiddelId is invalid");
             throw new ArgumentOutOfRangeException();
         }
-        if (startDato < DateTime.Now || slutDato < DateTime.Now
-                                     || startDato > slutDato)
+        if (startDato < DateTime.Now.AddDays(-1) || slutDato < DateTime.Now
+                                                 || startDato > slutDato)
         {
             Console.WriteLine("Date ranges are invalid");
             throw new ArgumentOutOfRangeException();
@@ -261,8 +262,71 @@ public class DataService
         pn.dates.Add(dato);
         db.SaveChanges();
         return "tilføjet";
+    }
+
+    public OrdinationVaegtDTO? GetOrdinationer(int vaegtFra, int vaegtTil, int laegemiddelId)
+    {
+        // Filtrer efter vægt
+        List<Patient> patienterMedRigtigVægt = db.Patienter.Include(p => p.ordinationer).ThenInclude(p => p.laegemiddel).Where(p => p.vaegt >= vaegtFra && p.vaegt <= vaegtTil).ToList();
+        if (patienterMedRigtigVægt.Count <= 0)
+        {
+            return null;
+        }
         
-        return null!;
+        // Find ordinationer med rigtige lægemiddel-navn, kobl sammen med patient vægt
+        List<PNVaegtDTO> pns = new List<PNVaegtDTO>();
+        List<DagligFastVaegtDTO> fast = new List<DagligFastVaegtDTO>();
+        List<DagligSkævVaegtDTO> skæv = new List<DagligSkævVaegtDTO>();
+        
+        foreach (Patient patient in patienterMedRigtigVægt)
+        {
+            foreach (Ordination ordination in patient.ordinationer)
+            {
+                if (ordination.laegemiddel.LaegemiddelId == laegemiddelId)
+                {
+                    switch (ordination.getType())
+                    {
+                        case "PN":
+                            PNVaegtDTO pn = new PNVaegtDTO()
+                            {
+                                PNOrdination = (PN)ordination,
+                                Vaegt = patient.vaegt,
+                            };
+                            pns.Add(pn);
+                            break;
+                        case "DagligSkæv":
+                            DagligSkævVaegtDTO sk = new DagligSkævVaegtDTO()
+                            {
+                                DagligSkævOrdination = (DagligSkæv)ordination,
+                                Vaegt = patient.vaegt,
+                            };
+                            skæv.Add(sk);
+                            break;
+                        case "DagligFast":
+                            DagligFastVaegtDTO dag = new DagligFastVaegtDTO()
+                            {
+                                DagligFastOrdination = (DagligFast)ordination,
+                                Vaegt = patient.vaegt,
+                            };
+                            fast.Add(dag);
+                            break;
+                        default:
+                            Console.WriteLine("Unknown ordination type");
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+        }
+        if (pns.Count <= 0 &&  fast.Count <= 0 && skæv.Count <= 0)
+            return null;
+        
+        var dto = new OrdinationVaegtDTO()
+        {
+            PNOrdinationer = pns,
+            DagligFastOrdinationer = fast,
+            DagligSkævOrdinationer = skæv
+        };
+        return dto;
     }
 
     /// <summary>
@@ -283,7 +347,28 @@ public class DataService
         {
             throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
         }
-             return -1;
+        Patient? patient = db.Patienter.FirstOrDefault(p => p.PatientId == patientId);
+        if (patient == null)
+        {
+            throw new ArgumentException($"Patient with id {patientId} not found");
+        }
+
+        if (patient.vaegt < 25)
+        {
+            return laegemiddel.enhedPrKgPrDoegnLet * patient.vaegt;
+        }
+
+        if (25 <= patient.vaegt && patient.vaegt <= 120)
+        {
+            return laegemiddel.enhedPrKgPrDoegnNormal * patient.vaegt;
+        }
+
+        if (patient.vaegt > 120)
+        {
+            return laegemiddel.enhedPrKgPrDoegnTung * patient.vaegt;
+        }
+
+        return -1;
     }
     
 }

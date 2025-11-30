@@ -1,0 +1,89 @@
+@using shared.Model
+<div class="imagedropdown-container">
+    
+    <div class="imagedropdown-header" @onclick="ToggleDropdown">
+        <span class="imagedropdown-arrow">▼ Ordinationer</span>
+    </div>
+    
+    @*hvis dropdown er åben, vises indholdet nedenfor*@
+    @if (_isOpen)
+    {
+        <div>
+            @if (antalPatienter > 0)
+            {
+                <ul>
+                    <h3>PN</h3>
+                    @if (pns.Count == 0)
+                    {
+                        <p>Ingen PN ordinationer</p>
+                    }
+                    else
+                    {
+                        @foreach (var ordination in pns)
+                        {
+                            <li>
+                                <span><b>Ordination ID: </b>@ordination.PNOrdination.OrdinationId</span><br/>
+                                <span><b>Ordination Start: </b>@ordination.PNOrdination.startDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Ordination Slut: </b>@ordination.PNOrdination.slutDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Patient Vægt: </b>@ordination.Vaegt</span><br/>
+                            </li>
+                            <hr>
+                        }
+                    }
+                </ul>
+                <ul>
+                    <h3>DagligFast</h3>
+                    @if (fast.Count == 0)
+                    {
+                        <p>Ingen Daglig fast ordinationer</p>
+                    }
+                    else
+                    {
+                        @foreach (var ordination in fast)
+                        {
+                            <li>
+                                <span><b>Ordination ID: </b>@ordination.DagligFastOrdination.OrdinationId</span><br/>
+                                <span><b>Ordination Start: </b>@ordination.DagligFastOrdination.startDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Ordination Slut: </b>@ordination.DagligFastOrdination.slutDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Patient Vægt: </b>@ordination.Vaegt</span>
+                            </li>
+                            <hr>
+                        }
+                    }
+                </ul>
+                <ul>
+                    <h3>DagligSkæv</h3>
+                    @if (skæv.Count == 0)
+                    {
+                        <p>Ingen Daglig skæv ordinationer</p>
+                    }
+                    else
+                    {
+                        @foreach (var ordination in skæv)
+                        {
+                            <li>
+                                <span><b>Ordination ID: </b>@ordination.DagligSkævOrdination.OrdinationId</span><br/>
+                                <span><b>Ordination Start: </b>@ordination.DagligSkævOrdination.startDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Ordination Slut: </b>@ordination.DagligSkævOrdination.slutDen.ToString("dd/MMM-yy")</span><br/>
+                                <span><b>Patient Vægt: </b>@ordination.Vaegt</span>
+                            </li>
+                            <hr>
+                        }
+                    }
+                </ul>
+            }
+        </div>
+    }
+</div>
+@code {
+    [Parameter]
+    public List<PNVaegtDTO> pns { get; set; }
+    [Parameter] 
+    public List<DagligFastVaegtDTO> fast { get; set; }
+    [Parameter]
+    public List<DagligSkævVaegtDTO> skæv { get; set; }
+    [Parameter]
+    public int antalPatienter { get; set; }
+    private bool _isOpen = false;
+    private void ToggleDropdown() => _isOpen = !_isOpen;
+}
