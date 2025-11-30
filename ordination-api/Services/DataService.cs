@@ -214,14 +214,14 @@ public class DataService
             throw new ArgumentOutOfRangeException();
         }
         Laegemiddel? laegemiddel = db.Laegemiddler.FirstOrDefault(l => l.LaegemiddelId == laegemiddelId);
-        if (laegemiddel == null)
-        {
-            throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
-        }
         if (laegemiddelId < 0)
         {
             Console.WriteLine("laegemiddelId is invalid");
             throw new ArgumentOutOfRangeException();
+        }
+        if (laegemiddel == null)
+        {
+            throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
         }
         if (startDato < DateTime.Now.AddDays(-1) || slutDato < DateTime.Now
                                                  || startDato > slutDato)
