@@ -347,6 +347,27 @@ public class DataService
         {
             throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
         }
+        Patient? patient = db.Patienter.FirstOrDefault(p => p.PatientId == patientId);
+        if (patient == null)
+        {
+            throw new ArgumentException($"Patient with id {patientId} not found");
+        }
+
+        if (patient.vaegt < 25)
+        {
+            return laegemiddel.enhedPrKgPrDoegnLet * patient.vaegt;
+        }
+
+        if (25 <= patient.vaegt && patient.vaegt <= 120)
+        {
+            return laegemiddel.enhedPrKgPrDoegnNormal * patient.vaegt;
+        }
+
+        if (patient.vaegt > 120)
+        {
+            return laegemiddel.enhedPrKgPrDoegnTung * patient.vaegt;
+        }
+
         return -1;
     }
     
