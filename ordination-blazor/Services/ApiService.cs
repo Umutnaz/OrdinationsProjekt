@@ -95,4 +95,18 @@ public class ApiService
         AnbefaletDosisDTO record = JsonSerializer.Deserialize<AnbefaletDosisDTO>(json)!;
         return record;
     }
+
+    public async Task<OrdinationVaegtDTO?> GetOrdinationerStatistik(int vaegtFra, int vaegtTil, int laegemiddelId)
+    {
+        string url = $"{baseAPI}ordinationer/specifik";
+        HttpResponseMessage res = await http.PostAsJsonAsync<SpecifikOrdinationDTO>(url,
+            new SpecifikOrdinationDTO(laegemiddelId, vaegtFra, vaegtTil));
+        if (res.IsSuccessStatusCode)
+        {
+            var json = await res.Content.ReadFromJsonAsync<OrdinationVaegtDTO>();
+            return json;
+        }
+
+        return null;
+    }
 }

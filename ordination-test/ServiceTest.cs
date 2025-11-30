@@ -101,15 +101,44 @@ public class ServiceTest
     }
     
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    public void PatientEllerLaegemiddelEksistererIkkeDagligFast()
+    {
+        int patientId = int.MaxValue;
+        int laegemiddelId = int.MaxValue;
+        DateTime validStart = DateTime.Now.AddDays(1);
+        DateTime validEnd = DateTime.Now.AddDays(2);
+        
+        // PatientId
+        Assert.ThrowsException<NullReferenceException>(()=> service.OpretDagligFast(patientId, 1, 2, 2, 2, 2, validStart, validEnd));
+        // laegemiddelId
+        Assert.ThrowsException<NullReferenceException>(()=> service.OpretDagligFast(1, laegemiddelId, 2, 2, 2, 2, validStart, validEnd));
+    }
+    
+    [TestMethod]
+    public void StartDatoLigMedSlutDatoDagligFast()
+    {
+        int patientId = 1;
+        int laegemiddelId = 1;
+        DateTime startDato = DateTime.Now.AddDays(1);
+        DateTime endDato = DateTime.Now.AddDays(1);
+        
+        int count = service.GetDagligFaste().Count();
+        
+        service.OpretDagligFast(patientId, laegemiddelId, 1, 1, 1, 1,  startDato, endDato);
+        
+        Assert.AreEqual(count + 1, service.GetDagligFaste().Count());
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(NullReferenceException))]
     public void TestAtKodenSmiderEnException()
     {
-        // Herunder skal man så kalde noget kode,
-        // der smider en exception.
-
-        // Hvis koden _ikke_ smider en exception,
-        // så fejler testen.
-
-        Console.WriteLine("Her kommer der ikke en exception. Testen fejler.");
+        int patientId = int.MaxValue;
+        int laegemiddelId = int.MaxValue;
+        DateTime validStart = DateTime.Now.AddDays(1);
+        DateTime validEnd = DateTime.Now.AddDays(2);
+        
+        // PatientId
+        service.OpretDagligFast(patientId, 1, 2, 2, 2, 2, validStart, validEnd);
     }
 }
