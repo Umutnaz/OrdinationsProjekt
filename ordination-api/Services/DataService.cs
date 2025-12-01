@@ -214,14 +214,14 @@ public class DataService
             throw new ArgumentOutOfRangeException();
         }
         Laegemiddel? laegemiddel = db.Laegemiddler.FirstOrDefault(l => l.LaegemiddelId == laegemiddelId);
-        if (laegemiddel == null)
-        {
-            throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
-        }
         if (laegemiddelId < 0)
         {
             Console.WriteLine("laegemiddelId is invalid");
             throw new ArgumentOutOfRangeException();
+        }
+        if (laegemiddel == null)
+        {
+            throw new ArgumentException($"Laegemiddel with id {laegemiddelId} not found");
         }
         if (startDato < DateTime.Now.AddDays(-1) || slutDato < DateTime.Now
                                                  || startDato > slutDato)
@@ -234,7 +234,24 @@ public class DataService
         {
             throw new ArgumentException($"Patient with id {patientId} not found");
         }
-        
+        if (doser == null) //tester om listen er null eller tom
+        {
+            Console.WriteLine("doser.list is null");
+            throw new ArgumentException("Doser-list is null");
+            
+        }
+
+        if (doser.Length == 0) //tester om listen er tom
+        {
+            Console.WriteLine("doser.list is empty");
+            throw new ArgumentException("Doser-list must contain at least one Dosis");
+        }
+        if (doser.Any(d => d == null)) //tester om listen indeholder et null element
+        {
+            Console.WriteLine("doser contains null elements");
+            throw new ArgumentException("Each Dosis in the doser-list must be non-null");
+        }
+
         DagligSkæv dagligSkaev = new DagligSkæv(startDato, slutDato, laegemiddel); //opretter den nye skæve dosering
         dagligSkaev.doser = doser.ToList(); //tilføjer doserne til den skæve dosering
         patient.ordinationer.Add(dagligSkaev); //tilføjer den skæve dosering til patienten til dosisen, så når man under linjen her, sætter dagligskæv ind i db så ryger dens forbindelse til patienten med

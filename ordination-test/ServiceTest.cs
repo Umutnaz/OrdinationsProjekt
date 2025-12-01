@@ -139,4 +139,94 @@ public class ServiceTest
         // PatientId
         service.OpretDagligFast(patientId, 1, 2, 2, 2, 2, validStart, validEnd);
     }
+    [TestMethod]
+public void PatientIdUnderNulDagligSkaev() //fejl for patientId < 0
+{
+    
+    int patientId = -1;
+    Laegemiddel lm = service.GetLaegemidler().First();
+    Dosis[] doser = new Dosis[] { new Dosis() };
+    DateTime startDato = DateTime.Now.AddDays(1);
+    DateTime slutDato = DateTime.Now.AddDays(2);
+
+    
+    Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        service.OpretDagligSkaev(patientId, lm.LaegemiddelId, doser, startDato, slutDato));
+}
+
+[TestMethod]
+public void LaegemiddelEksistererIkkeDagligSkaev() //fejl for laegemiddel findes ikke
+{
+    
+    Patient patient = service.GetPatienter().First();
+    int laegemiddelId = int.MaxValue; // findes ikke
+    Dosis[] doser = new Dosis[] { new Dosis() };
+    DateTime startDato = DateTime.Now.AddDays(1);
+    DateTime slutDato = DateTime.Now.AddDays(2);
+
+    
+    Assert.ThrowsException<ArgumentException>(() =>
+        service.OpretDagligSkaev(patient.PatientId, laegemiddelId, doser, startDato, slutDato));
+}
+
+[TestMethod]
+public void LaegemiddelIdUnderNulDagligSkaev() //fejl for laegemiddelId < 0
+{
+    
+    Patient patient = service.GetPatienter().First();
+    int laegemiddelId = -1;
+    Dosis[] doser = new Dosis[] { new Dosis() };
+    DateTime startDato = DateTime.Now.AddDays(1);
+    DateTime slutDato = DateTime.Now.AddDays(2);
+
+    
+    Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        service.OpretDagligSkaev(patient.PatientId, laegemiddelId, doser, startDato, slutDato));
+}
+
+[TestMethod]
+public void UgyldigtDatoIntervalDagligSkaev() //fejl for startDato > slutDato
+{
+    
+    Patient patient = service.GetPatienter().First();
+    Laegemiddel lm = service.GetLaegemidler().First();
+    Dosis[] doser = new Dosis[] { new Dosis() };
+    DateTime startDato = DateTime.Now.AddDays(5);
+    DateTime slutDato = DateTime.Now.AddDays(3); // startDato > slutDato
+
+    
+    Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+        service.OpretDagligSkaev(patient.PatientId, lm.LaegemiddelId, doser, startDato, slutDato));
+}
+
+[TestMethod]
+public void PatientEksistererIkkeDagligSkaev() //fejl for patient findes ikke
+{
+    
+    int patientId = int.MaxValue; // findes ikke
+    Laegemiddel lm = service.GetLaegemidler().First();
+    Dosis[] doser = new Dosis[] { new Dosis() };
+    DateTime startDato = DateTime.Now.AddDays(1);
+    DateTime slutDato = DateTime.Now.AddDays(2);
+
+    
+    Assert.ThrowsException<ArgumentException>(() =>
+        service.OpretDagligSkaev(patientId, lm.LaegemiddelId, doser, startDato, slutDato));
+}
+
+[TestMethod]
+public void DoserErNullDagligSkaev() //fejl for doser er null
+{
+    
+    Patient patient = service.GetPatienter().First();
+    Laegemiddel lm = service.GetLaegemidler().First();
+    Dosis[] doser = null;
+    DateTime startDato = DateTime.Now.AddDays(1);
+    DateTime slutDato = DateTime.Now.AddDays(2);
+
+    
+    Assert.ThrowsException<ArgumentException>(() =>
+        service.OpretDagligSkaev(patient.PatientId, lm.LaegemiddelId, doser, startDato, slutDato));
+}
+
 }
