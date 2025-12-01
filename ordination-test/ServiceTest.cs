@@ -47,31 +47,42 @@ public class ServiceTest
         int patientId = -1;
         int laegemiddelId = 1;
         
+        // Invalid patientId
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1,
             1, 1, DateTime.Today.AddDays(1),DateTime.Now.AddDays(2)));
         
         patientId = 1;
         laegemiddelId = -1;
         
+        // Invalid lægemiddelId
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1,
             1, 1, DateTime.Today.AddDays(1),DateTime.Now.AddDays(2)));
         
         DateTime invalidStart = DateTime.Now.AddDays(-1);
         
+        // Invalid start dato
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1,
             1, 1, invalidStart,DateTime.Now.AddDays(2)));
         
         DateTime validStart = DateTime.Now.AddDays(5);
         DateTime invalidEnd = DateTime.Now.AddDays(4);
         
+        // Invalid slut dato
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1,
             1, 1, validStart,invalidEnd));
 
         double invalidDosis = -1;
         
+        // Invalid dosis
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, invalidDosis,
             1, 1, DateTime.Today.AddDays(1),DateTime.Now.AddDays(2)));
 
+        patientId = 0;
+        laegemiddelId = 0;
+
+        // Invalid grænse værdier
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => service.OpretDagligFast(patientId, laegemiddelId, 1, 1, 1,
+            1, DateTime.Now.AddDays(1),DateTime.Now.AddDays(2) ));
     }
 
     [TestMethod]
